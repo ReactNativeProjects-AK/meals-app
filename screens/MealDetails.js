@@ -1,23 +1,18 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Image,
-  Pressable,
-} from "react-native";
+import { View, Text, StyleSheet, ScrollView, Image } from "react-native";
 import { MEALS } from "../data/dummy-data";
 import MealInfo from "../components/MealInfo";
 import SubHeader from "../components/SubHeader";
 import List from "../components/List";
 import { useLayoutEffect } from "react";
-import { Ionicons } from "@expo/vector-icons";
+import { useContext } from "react";
+import { FavouriteContext } from "../store/FavouriteStore";
+import FavouriteMeal from "../components/FavouriteMeal";
 
 export default function MealDetailsScreen({ route, navigation }) {
+  const { addFavourite, removeFavourite, ids } = useContext(FavouriteContext);
   const mealId = route.params.mealId;
 
   const {
-    id,
     title,
     imageUrl,
     ingredients,
@@ -27,21 +22,30 @@ export default function MealDetailsScreen({ route, navigation }) {
     duration,
   } = MEALS.find((meal) => meal.id === mealId);
 
-  const handleFavouritePress = () => {
-    console.log("Favourite Pressed");
-  };
+  const isFavourite = ids.includes(mealId);
+
+  function handleFavouritePress() {
+    if (isFavourite) {
+      removeFavourite(mealId);
+    } else {
+      addFavourite(mealId);
+    }
+  }
 
   useLayoutEffect(() => {
-    const meal = MEALS.find((meal) => meal.id === mealId);
     navigation.setOptions({
-      title: meal.title,
-      headerRight: () => (
-        <Pressable onPress={handleFavouritePress}>
-          <Ionicons name="star" size={24} color="white" />
-        </Pressable>
-      ),
+      title: title,
+      headerRight() {
+        return (
+          <FavouriteMeal
+            onPress={handleFavouritePress}
+            icon={isFavourite ? "star" : "star-outline"}
+            color="white"
+          />
+        );
+      },
     });
-  }, [navigation, mealId]);
+  }, [navigation, handleFavouritePress]);
 
   return (
     <ScrollView style={styles.container}>
