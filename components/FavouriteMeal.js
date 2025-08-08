@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 function FavouriteMeal({ icon, color, onPress }) {
   return (
     <Pressable
-      onPress={onPress}
+      onPressOut={onPress}
       style={({ pressed }) => pressed && styles.pressed}
     >
       <Ionicons name={icon} size={24} color={color} />
